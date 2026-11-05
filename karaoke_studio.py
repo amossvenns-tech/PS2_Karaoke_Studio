@@ -270,12 +270,19 @@ def process_song(mp3_path, output_root, log, status):
         "-n", "htdemucs", "-o", str(work_dir), str(mp3)
     ], log)
 
-    # Demucs writes: _work/htdemucs/<song name>/vocals.wav and no_vocals.wav
-    separated = work_dir / "htdemucs" / mp3.stem
-    vocals_src = separated / "vocals.wav"
-    instrumental_src = separated / "no_vocals.wav"
-    if not vocals_src.exists() or not instrumental_src.exists():
-        raise FileNotFoundError("Demucs skapade inte de förväntade ljudfilerna.")
+        # Demucs writes vocals.wav and no_vocals.wav
+    # Leta efter Demucs ljudfiler i alla undermappar
+    vocals_files = list(work_dir.rglob("vocals.wav"))
+    instrumental_files = list(work_dir.rglob("no_vocals.wav"))
+
+
+    vocals_src = vocals_files[0]
+    instrumental_src = instrumental_files[0]
+
+    import soundfile as sf
+    import numpy as np
+
+
 
     import soundfile as sf
     import numpy as np
